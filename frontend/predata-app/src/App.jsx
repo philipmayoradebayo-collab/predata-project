@@ -3,7 +3,7 @@ import { useState } from "react"
 import axios from "axios"
 import "./App.css"
 
-const API = "http://127.0.0.1:8000"
+const API = "https://predata-project.onrender.com"
 
 // ── Crop Recommendation Form ──────────────────────────────
 function CropAdvisor() {
