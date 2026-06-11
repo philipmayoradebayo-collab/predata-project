@@ -372,12 +372,12 @@ from fastapi import Form
 
 @app.post("/ussd")
 async def ussd(
-    sessionId:   str = Form(...),
-    phoneNumber: str = Form(...),
-    text:        str = Form("")
+    sessionId:   str = Form(default="default"),
+    phoneNumber: str = Form(default="0000"),
+    text:        str = Form(default="")
 ):
-    inputs = text.split("*") if text else []
-    level  = len(inputs)
+    inputs: list[str] = text.split("*") if text else []
+    level: int  = len(inputs)
 
     response = ""
 
