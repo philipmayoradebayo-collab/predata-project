@@ -5,7 +5,7 @@ import "./App.css"
 
 const API = "https://predata-project.onrender.com"
 
-// ── Crop Recommendation Form ──────────────────────────────
+//  Crop Recommendation Form
 function CropAdvisor() {
   const [form, setForm] = useState({
     N: "", P: "", K: "",
@@ -84,7 +84,7 @@ function CropAdvisor() {
   )
 }
 
-// ── Weather Prediction Form ───────────────────────────────
+//  Weather Prediction Form 
 function WeatherPredictor() {
   const [form, setForm] = useState({
     temp_avg: "", temp_max: "", temp_min: "",
@@ -159,8 +159,8 @@ function WeatherPredictor() {
       {result && (
         <div className="result">
           <h3>Tomorrow's Forecast</h3>
-          <p>🌡️ Predicted Temperature: <strong>{result.predicted_temperature} {result.unit_temperature}</strong></p>
-          <p>🌧️ Predicted Rainfall: <strong>{result.predicted_rainfall} {result.unit_rainfall}</strong></p>
+          <p> Predicted Temperature: <strong>{result.predicted_temperature} {result.unit_temperature}</strong></p>
+          <p> Predicted Rainfall: <strong>{result.predicted_rainfall} {result.unit_rainfall}</strong></p>
         </div>
       )}
     </div>
@@ -168,7 +168,7 @@ function WeatherPredictor() {
 }
 
 
-// ── Crop Intelligence Component ──────────────────────────
+//  Crop Intelligence Component
 function CropIntelligence() {
   const [cropName, setCropName] = useState("")
   const [state, setState]       = useState("Nigeria")
@@ -303,7 +303,7 @@ export default function App() {
   return (
     <div>
       <nav className="navbar">
-        <h1>🌿 PreData — AI Farm Assistant</h1>
+        <h1>🌿 AgroSense NG  Farm Assistant</h1>
         <span>Microclimate Prediction & Nutrient Recommendation</span>
       </nav>
 
