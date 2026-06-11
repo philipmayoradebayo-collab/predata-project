@@ -364,6 +364,172 @@ def crop_intelligence(data: CropQuery):
             "found": False,
             "message": f"Crop '{data.crop_name}' not in database yet. Currently supported: {', '.join(crop_db.keys())}"
         }
-
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    # ---- USSD ENDPOINT ----
+from fastapi import Form
+
+@app.post("/ussd")
+async def ussd(
+    sessionId:   str = Form(...),
+    phoneNumber: str = Form(...),
+    text:        str = Form("")
+):
+    inputs = text.split("*") if text else []
+    level  = len(inputs)
+
+    response = ""
+
+    if text == "":
+        response = (
+            "CON Welcome to AgroSense NG\n"
+            "AI Farm Assistant\n\n"
+            "1. Crop Recommendation\n"
+            "2. Crop Planting Guide\n"
+            "3. Weather Forecast\n"
+            "4. About AgroSense NG\n"
+            "0. Exit"
+        )
+
+    elif text == "1":
+        response = "CON Crop Recommendation\nEnter Nitrogen (N) level:\n(e.g. 90)"
+
+    elif text == "2":
+        response = (
+            "CON Crop Planting Guide\n"
+            "Select crop:\n\n"
+            "1. Maize\n"
+            "2. Rice\n"
+            "3. Cassava\n"
+            "4. Tomato\n"
+            "5. Yam"
+        )
+
+    elif text == "3":
+        response = "CON Weather Forecast\nEnter current temperature (C):\n(e.g. 27)"
+
+    elif text == "4":
+        response = (
+            "END AgroSense NG v1.0\n"
+            "AI Farm Assistant\n"
+            "By: Adebayo Mayowa Philip\n"
+            "SQI College of ICT\n"
+            "Accuracy: 99.55%\n"
+            "Coverage: 36 States"
+        )
+
+    elif text == "0":
+        response = "END Thank you for using AgroSense NG!\nDial *384*1# anytime."
+
+    elif inputs[0] == "1" and level == 2:
+        response = "CON Enter Phosphorus (P) level:\n(e.g. 42)"
+
+    elif inputs[0] == "1" and level == 3:
+        response = "CON Enter Potassium (K) level:\n(e.g. 43)"
+
+    elif inputs[0] == "1" and level == 4:
+        response = "CON Enter Temperature (C):\n(e.g. 27)"
+
+    elif inputs[0] == "1" and level == 5:
+        response = "CON Enter Humidity (%):\n(e.g. 80)"
+
+    elif inputs[0] == "1" and level == 6:
+        response = "CON Enter Soil pH:\n(e.g. 6.5)"
+
+    elif inputs[0] == "1" and level == 7:
+        response = "CON Enter Rainfall (mm):\n(e.g. 200)"
+
+    elif inputs[0] == "1" and level == 8:
+        N, P, K = inputs[1], inputs[2], inputs[3]
+        temp, humidity, ph, rainfall = inputs[4], inputs[5], inputs[6], inputs[7]
+        try:
+            input_df = pd.DataFrame([{
+                "N": float(N), "P": float(P), "K": float(K),
+                "temperature": float(temp),
+                "humidity": float(humidity),
+                "ph": float(ph),
+                "rainfall": float(rainfall)
+            }])
+            prediction    = rf_model.predict(input_df)
+            crop_name     = label_encoder.inverse_transform(prediction)[0]
+            probabilities = rf_model.predict_proba(input_df)[0]
+            confidence    = round(float(max(probabilities)) * 100, 2)
+            npk_guide = {
+                "maize":       {"N": "120 kg/ha", "P": "60 kg/ha", "K": "40 kg/ha"},
+                "rice":        {"N": "100 kg/ha", "P": "50 kg/ha", "K": "50 kg/ha"},
+                "chickpea":    {"N": "20 kg/ha",  "P": "60 kg/ha", "K": "40 kg/ha"},
+                "kidneybeans": {"N": "25 kg/ha",  "P": "60 kg/ha", "K": "40 kg/ha"},
+                "banana":      {"N": "200 kg/ha", "P": "60 kg/ha", "K": "300 kg/ha"},
+                "mango":       {"N": "100 kg/ha", "P": "50 kg/ha", "K": "100 kg/ha"},
+                "coffee":      {"N": "150 kg/ha", "P": "30 kg/ha", "K": "150 kg/ha"},
+            }
+            npk = npk_guide.get(crop_name, {"N": "See agronomist", "P": "See agronomist", "K": "See agronomist"})
+            response = (
+                f"END Recommended: {crop_name.upper()}\n"
+                f"Confidence: {confidence}%\n"
+                f"N: {npk['N']}\n"
+                f"P: {npk['P']}\n"
+                f"K: {npk['K']}"
+            )
+        except Exception as e:
+            response = f"END Error: {str(e)}"
+
+    elif inputs[0] == "2" and level == 2:
+        crops = {"1": "maize", "2": "rice", "3": "cassava", "4": "tomato", "5": "yam"}
+        crop  = crops.get(inputs[1], "maize")
+        crop_db = {
+            "maize":   {"plant": "Mar-Apr (South), May-Jun (North)", "harvest": "Jul-Aug",    "price": "N280,000/tonne"},
+            "rice":    {"plant": "May-Jun (rainy)",                  "harvest": "Oct-Nov",    "price": "N450,000/tonne"},
+            "cassava": {"plant": "Mar-Apr",                          "harvest": "12-18 months","price": "N120,000/tonne"},
+            "tomato":  {"plant": "Oct-Nov (dry)",                    "harvest": "60-90 days", "price": "N350,000/tonne"},
+            "yam":     {"plant": "Feb-Mar",                          "harvest": "Aug-Oct",    "price": "N200,000/tonne"},
+        }
+        info = crop_db.get(crop, {})
+        response = (
+            f"END {crop.upper()} Guide\n"
+            f"Plant: {info.get('plant','N/A')}\n"
+            f"Harvest: {info.get('harvest','N/A')}\n"
+            f"Price: {info.get('price','N/A')}"
+        )
+
+    elif inputs[0] == "3" and level == 2:
+        response = "CON Enter Humidity (%):\n(e.g. 80)"
+
+    elif inputs[0] == "3" and level == 3:
+        response = "CON Enter current month (1-12):\n(e.g. 6 for June)"
+
+    elif inputs[0] == "3" and level == 4:
+        temp     = inputs[1]
+        humidity = inputs[2]
+        month    = inputs[3]
+        try:
+            scaled_seq = scaler.transform(
+                [[float(temp), float(temp)+5, float(temp)-5,
+                  float(humidity), 5.0, 18.0, 2.5, 3.0,
+                  int(month), int(month)*30,
+                  1 if int(month) in [4,5,6,7,8,9,10] else 0]] * 30
+            ).reshape(1, 30, 11)
+            tensor_input = torch.FloatTensor(scaled_seq)
+            with torch.no_grad():
+                prediction = lstm_model(tensor_input)
+                pred_np    = prediction.numpy()[0]
+            response = (
+                f"END Weather Forecast:\n"
+                f"Temperature: {round(float(pred_np[0])*50,1)}C\n"
+                f"Rainfall: {round(float(pred_np[1])*300,1)}mm\n"
+                f"Plan your farm well!"
+            )
+        except Exception as e:
+            response = f"END Error: {str(e)}"
+
+    else:
+        response = (
+            "CON Invalid input.\n\n"
+            "1. Crop Recommendation\n"
+            "2. Crop Planting Guide\n"
+            "3. Weather Forecast\n"
+            "0. Exit"
+        )
+
+    return response
