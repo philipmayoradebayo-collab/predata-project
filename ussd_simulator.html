@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PreData USSD Simulator</title>
+  <title>AgroSense NG USSD Simulator</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -225,7 +225,7 @@
 <body>
 
 <div class="page">
-  <h1>🌿 PreData USSD Simulator</h1>
+  <h1>🌿 AgroSense NG USSD Simulator</h1>
   <p>Simulating *384*1# for smallholder farmers</p>
 
   <div class="phone">
@@ -243,7 +243,7 @@
       <div class="ussd-code">*384*1#</div>
       <div class="screen-text" id="screen">
 Dial *384*1# to start
-PreData AI Farm Assistant
+AgroSense NG Farm Assistant
 
 Press DIAL to begin...
       </div>
@@ -349,7 +349,7 @@ Press DIAL to begin...
       formData.append("phoneNumber", phoneNumber)
       formData.append("text",        text)
 
-      const response = await fetch("http://127.0.0.1:5001/ussd", {
+      const response = await fetch("https://predata-project.onrender.com/ussd",  {
         method: "POST",
         body:   formData
       })
@@ -387,8 +387,8 @@ Press DIAL to begin...
   function cancelSession() {
     sessionActive = false
     currentText   = ""
-    document.getElementById("screen").textContent =
-      "Session ended.\n\nDial *384*1# to start\nPreData AI Farm Assistant\n\nPress DIAL to begin..."
+document.getElementById("screen").textContent =
+    "Dial *384*1# to start\nAgroSense NG Farm Assistant\n\nPress DIAL to begin..."
     document.getElementById("dial-bar").textContent = "*384*1#"
     document.getElementById("user-input").value = ""
   }
