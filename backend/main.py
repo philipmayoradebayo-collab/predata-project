@@ -532,4 +532,5 @@ async def ussd(
             "0. Exit"
         )
 
-    return response
+    from fastapi.responses import PlainTextResponse
+    return PlainTextResponse(content=response)
