@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgroSense NG USSD Simulator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #1a1a2e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .page {
+      text-align: center;
+    }
+
+    .page h1 {
+      color: #fff;
+      margin-bottom: 0.5rem;
+      font-size: 1.5rem;
+    }
+
+    .page p {
+      color: #aaa;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+    }
+
+    /* Phone */
+    .phone {
+      width: 280px;
+      background: #111;
+      border-radius: 36px;
+      padding: 20px 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5),
+                  inset 0 1px 0 rgba(255,255,255,0.1);
+      border: 2px solid #333;
+      margin: 0 auto;
+    }
+
+    .phone-top {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .speaker {
+      width: 60px;
+      height: 6px;
+      background: #333;
+      border-radius: 3px;
+    }
+
+    /* Screen */
+    .screen {
+      background: #000;
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 220px;
+      border: 1px solid #222;
+      margin-bottom: 12px;
+    }
+
+    .screen-header {
+      display: flex;
+      justify-content: space-between;
+      color: #aaa;
+      font-size: 0.65rem;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #222;
+    }
+
+    .ussd-code {
+      color: #4caf50;
+      font-size: 0.7rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+      text-align: left;
+    }
+
+    .screen-text {
+      color: #fff;
+      font-size: 0.75rem;
+      line-height: 1.6;
+      text-align: left;
+      white-space: pre-wrap;
+      min-height: 140px;
+    }
+
+    /* Input */
+    .input-area {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .input-area input {
+      flex: 1;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #fff;
+      padding: 8px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .input-area input:focus {
+      border-color: #4caf50;
+    }
+
+    .btn-send {
+      background: #4caf50;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .btn-send:hover { background: #388e3c; }
+
+    /* Keypad */
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .key {
+      background: #222;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #fff;
+      padding: 10px 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: bold;
+      transition: background 0.1s;
+    }
+
+    .key:hover { background: #333; }
+    .key:active { background: #444; }
+
+    .key-star { color: #4caf50; }
+    .key-hash { color: #4caf50; }
+
+    /* Action buttons */
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .btn-cancel {
+      background: #c62828;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .btn-ok {
+      background: #2e7d32;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .btn-cancel:hover { background: #b71c1c; }
+    .btn-ok:hover { background: #1b5e20; }
+
+    /* Dial bar */
+    .dial-bar {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 20px;
+      padding: 8px 16px;
+      color: #4caf50;
+      font-size: 1rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+    /* Instructions */
+    .instructions {
+      color: #888;
+      font-size: 0.75rem;
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .instructions span {
+      color: #4caf50;
+      font-weight: bold;
+    }
+
+    .loading {
+      color: #4caf50;
+      font-size: 0.75rem;
+      text-align: center;
+      padding: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <h1>🌿 AgroSense NG USSD Simulator</h1>
+  <p>Simulating *384*1# for smallholder farmers</p>
+
+  <div class="phone">
+    <div class="phone-top">
+      <div class="speaker"></div>
+    </div>
+
+    <!-- Screen -->
+    <div class="screen">
+      <div class="screen-header">
+        <span>📶 MTN NG</span>
+        <span id="time">12:00</span>
+        <span>🔋</span>
+      </div>
+      <div class="ussd-code">*384*1#</div>
+      <div class="screen-text" id="screen">
+Dial *384*1# to start
+AgroSense NG Farm Assistant
+
+Press DIAL to begin...
+      </div>
+      <div class="loading" id="loading" style="display:none">Processing...</div>
+    </div>
+
+    <!-- Dial bar -->
+    <div class="dial-bar" id="dial-bar">*384*1#</div>
+
+    <!-- Input -->
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Enter option..." maxlength="20" />
+      <button class="btn-send" onclick="sendInput()">Send</button>
+    </div>
+
+    <!-- Keypad -->
+    <div class="keypad">
+      <button class="key" onclick="pressKey('1')">1</button>
+      <button class="key" onclick="pressKey('2')">2</button>
+      <button class="key" onclick="pressKey('3')">3</button>
+      <button class="key" onclick="pressKey('4')">4</button>
+      <button class="key" onclick="pressKey('5')">5</button>
+      <button class="key" onclick="pressKey('6')">6</button>
+      <button class="key" onclick="pressKey('7')">7</button>
+      <button class="key" onclick="pressKey('8')">8</button>
+      <button class="key" onclick="pressKey('9')">9</button>
+      <button class="key key-star" onclick="pressKey('*')">*</button>
+      <button class="key" onclick="pressKey('0')">0</button>
+      <button class="key key-hash" onclick="pressKey('#')">#</button>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn-cancel" onclick="cancelSession()">END</button>
+      <button class="btn-ok" onclick="dialUSSD()">DIAL</button>
+    </div>
+  </div>
+
+  <div class="instructions">
+    Press <span>DIAL</span> to start → Select options with keypad → Press <span>Send</span>
+  </div>
+</div>
+
+<script>
+  let sessionId   = "sim_" + Math.random().toString(36).substr(2, 9)
+  let phoneNumber = "+2348012345678"
+  let currentText = ""
+  let sessionActive = false
+
+  // Update clock
+  function updateTime() {
+    const now = new Date()
+    document.getElementById("time").textContent =
+      now.getHours().toString().padStart(2,"0") + ":" +
+      now.getMinutes().toString().padStart(2,"0")
+  }
+  updateTime()
+  setInterval(updateTime, 1000)
+
+  // Press keypad key
+  function pressKey(key) {
+    if (!sessionActive) return
+    const input = document.getElementById("user-input")
+    input.value += key
+  }
+
+  // Dial USSD code
+  async function dialUSSD() {
+    sessionId     = "sim_" + Math.random().toString(36).substr(2, 9)
+    currentText   = ""
+    sessionActive = true
+    document.getElementById("user-input").value = ""
+    await sendToUSSD("")
+  }
+
+  // Send input
+  async function sendInput() {
+    if (!sessionActive) {
+      alert("Press DIAL first to start a session!")
+      return
+    }
+    const input = document.getElementById("user-input").value.trim()
+    if (!input) return
+
+    if (currentText === "") {
+      currentText = input
+    } else {
+      currentText += "*" + input
+    }
+
+    document.getElementById("user-input").value = ""
+    await sendToUSSD(currentText)
+  }
+
+  // Send to USSD backend
+  async function sendToUSSD(text) {
+    document.getElementById("loading").style.display = "block"
+    document.getElementById("screen").style.display  = "none"
+
+    try {
+      const formData = new FormData()
+      formData.append("sessionId",   sessionId)
+      formData.append("phoneNumber", phoneNumber)
+      formData.append("text",        text)
+
+      const response = await fetch("https://predata-project.onrender.com/ussd",  {
+        method: "POST",
+        body:   formData
+      })
+
+      const result = await response.text()
+      displayResult(result)
+
+    } catch (error) {
+      document.getElementById("screen").textContent =
+        "Connection Error!\n\nMake sure USSD backend\nis running on port 5001.\n\nRun: python ussd_app.py"
+      document.getElementById("screen").style.display = "block"
+    }
+
+    document.getElementById("loading").style.display = "none"
+    document.getElementById("screen").style.display  = "block"
+  }
+
+  // Display result on screen
+  function displayResult(result) {
+    const screen = document.getElementById("screen")
+
+    if (result.startsWith("END")) {
+      screen.textContent = result.replace("END ", "")
+      sessionActive = false
+      document.getElementById("dial-bar").textContent = "*384*1#"
+    } else if (result.startsWith("CON")) {
+      screen.textContent = result.replace("CON ", "")
+      document.getElementById("dial-bar").textContent = currentText || "*384*1#"
+    } else {
+      screen.textContent = result
+    }
+  }
+
+  // Cancel session
+  function cancelSession() {
+    sessionActive = false
+    currentText   = ""
+document.getElementById("screen").textContent =
+    "Dial *384*1# to start\nAgroSense NG Farm Assistant\n\nPress DIAL to begin..."
+    document.getElementById("dial-bar").textContent = "*384*1#"
+    document.getElementById("user-input").value = ""
+  }
+
+  // Allow Enter key to send
+  document.getElementById("user-input").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") sendInput()
+  })
+</script>
+</body>
+</html>
