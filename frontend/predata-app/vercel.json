@@ -1,6 +1,7 @@
 {
+  "cleanUrls": true,
   "rewrites": [
-    { "source": "/ussd.html", "destination": "/ussd.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/ussd", "destination": "/ussd.html" },
+    { "source": "/((?!ussd).*)", "destination": "/index.html" }
   ]
 }
