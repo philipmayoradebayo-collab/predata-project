@@ -1,11 +1,11 @@
-// App.jsx — PreData Farmer Dashboard
+// App.jsx — AgroSense NG Farm Assistant
 import { useState } from "react"
 import axios from "axios"
 import "./App.css"
 
 const API = "https://predata-project.onrender.com"
 
-//  Crop Recommendation Form
+//  Crop Recommendation Form 
 function CropAdvisor() {
   const [form, setForm] = useState({
     N: "", P: "", K: "",
@@ -159,16 +159,15 @@ function WeatherPredictor() {
       {result && (
         <div className="result">
           <h3>Tomorrow's Forecast</h3>
-          <p> Predicted Temperature: <strong>{result.predicted_temperature} {result.unit_temperature}</strong></p>
-          <p> Predicted Rainfall: <strong>{result.predicted_rainfall} {result.unit_rainfall}</strong></p>
+          <p>🌡️ Predicted Temperature: <strong>{result.predicted_temperature} {result.unit_temperature}</strong></p>
+          <p>🌧️ Predicted Rainfall: <strong>{result.predicted_rainfall} {result.unit_rainfall}</strong></p>
         </div>
       )}
     </div>
   )
 }
 
-
-//  Crop Intelligence Component
+//  Crop Intelligence Component 
 function CropIntelligence() {
   const [cropName, setCropName] = useState("")
   const [state, setState]       = useState("Nigeria")
@@ -234,7 +233,6 @@ function CropIntelligence() {
           <h3 style={{fontSize:"1.3rem"}}>🌾 {result.crop.toUpperCase()} — Complete Guide</h3>
 
           <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:"1rem", marginTop:"1rem"}}>
-
             <div style={{background:"#f1f8e9", padding:"1rem", borderRadius:"8px"}}>
               <h4 style={{color:"#2d6a4f", marginBottom:"0.5rem"}}>📅 Planting & Harvest</h4>
               <p><strong>Plant:</strong> {result.data.planting_period}</p>
@@ -264,7 +262,6 @@ function CropIntelligence() {
               <p><strong>Yield:</strong> {result.data.yield_per_ha}</p>
               <p><strong>Price:</strong> {result.data.market_price}</p>
             </div>
-
           </div>
 
           <div style={{marginTop:"1rem", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1rem"}}>
@@ -299,12 +296,14 @@ function CropIntelligence() {
     </div>
   )
 }
+
+//  Main App 
 export default function App() {
   return (
     <div>
       <nav className="navbar">
-        <h1>🌿 AgroSense NG  Farm Assistant</h1>
-        <span>Microclimate Prediction & Nutrient Recommendation</span>
+        <h1>🌿 AgroSense NG — Farm Assistant</h1>
+        <span>AI-Powered Microclimate Prediction & Crop Advisory for Nigeria</span>
       </nav>
 
       <div className="container">
@@ -315,29 +314,42 @@ export default function App() {
             <div className="label">Crop Model Accuracy</div>
           </div>
           <div className="stat-card">
-            <div className="value">0.0087</div>
+            <div className="value">0.0018</div>
             <div className="label">Weather Model MSE</div>
           </div>
           <div className="stat-card">
-            <div className="value">9,861</div>
+            <div className="value">131,480</div>
             <div className="label">Training Records</div>
           </div>
           <div className="stat-card">
-            <div className="value">22</div>
-            <div className="label">Crops Supported</div>
+            <div className="value">36</div>
+            <div className="label">States Covered</div>
           </div>
         </div>
 
         {/* Main Cards */}
         <div className="cards">
-  <CropAdvisor />
-  <WeatherPredictor />
-</div>
+          <CropAdvisor />
+          <WeatherPredictor />
+        </div>
 
-{/* Crop Intelligence — Full Width */}
-<div className="cards">
-  <CropIntelligence />
-</div>
+        {/* Crop Intelligence — Full Width */}
+        <div className="cards">
+          <CropIntelligence />
+        </div>
+
+        {/* USSD Link */}
+        <div style={{textAlign:"center", marginTop:"2rem", marginBottom:"2rem"}}>
+          <a href="https://agrosense-ussd.vercel.app" target="_blank" style={{
+            background:"#2d6a4f", color:"#fff",
+            padding:"0.75rem 2rem", borderRadius:"8px",
+            textDecoration:"none", fontWeight:"bold",
+            fontSize:"1rem"
+          }}>
+             Open USSD Simulator (*384*1#) — For Smallholder Farmers
+          </a>
+        </div>
+
       </div>
     </div>
   )
