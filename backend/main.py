@@ -13,7 +13,26 @@ import torch
 import torch.nn as nn
 import sys
 import os
+import mysql.connector
+try:
+    from passlib.context import CryptContext
+except ImportError:
+    raise RuntimeError(
+        "passlib is required for password hashing. Install it with: pip install passlib[bcrypt]"
+    )
+import secrets
 
+# Password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Database connection
+def get_db():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="agrosense_ng"
+    )
 # Add parent folder to path so we can import our model class
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -534,3 +553,117 @@ async def ussd(
 
     from fastapi.responses import PlainTextResponse
     return PlainTextResponse(content=response)
+# ---- AUTH SCHEMAS ----
+class RegisterInput(BaseModel):
+    full_name:  str
+    email:      str
+    phone:      str
+    state:      str
+    farm_size:  str
+    password:   str
+
+class LoginInput(BaseModel):
+    email:    str
+    password: str
+
+# ---- REGISTER ENDPOINT ----
+@app.post("/auth/register")
+def register(data: RegisterInput):
+    try:
+        db = get_db()
+        cursor = db.cursor()
+
+        # Check if email already exists
+        cursor.execute("SELECT id FROM users WHERE email = %s", (data.email,))
+        if cursor.fetchone():
+            raise HTTPException(status_code=400, detail="Email already registered")
+
+        # Hash password
+        hashed_password = pwd_context.hash(data.password)
+
+        # Insert user
+        cursor.execute("""
+            INSERT INTO users (full_name, email, phone, state, farm_size, password)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (data.full_name, data.email, data.phone,
+              data.state, data.farm_size, hashed_password))
+        db.commit()
+
+        return {
+            "message": "Registration successful!",
+            "user": {
+                "full_name": data.full_name,
+                "email":     data.email,
+                "state":     data.state
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        db.close()
+
+# ---- LOGIN ENDPOINT ----
+@app.post("/auth/login")
+def login(data: LoginInput):
+    try:
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+
+        # Find user by email
+        cursor.execute("SELECT * FROM users WHERE email = %s", (data.email,))
+        user = cursor.fetchone()
+
+        if not user:
+            raise HTTPException(status_code=401, detail="Email not found")
+
+        # Verify password
+        if not pwd_context.verify(data.password, user["password"]):
+            raise HTTPException(status_code=401, detail="Wrong password")
+
+        # Generate simple token
+        token = secrets.token_hex(32)
+
+        return {
+            "message": "Login successful!",
+            "token": token,
+            "user": {
+                "id":        user["id"],
+                "full_name": user["full_name"],
+                "email":     user["email"],
+                "state":     user["state"],
+                "farm_size": user["farm_size"],
+                "phone":     user["phone"]
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        db.close()
+
+# ---- GET USER PROFILE ----
+@app.get("/auth/profile/{email}")
+def get_profile(email: str):
+    try:
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT id, full_name, email, phone, state, farm_size, created_at FROM users WHERE email = %s",
+            (email,)
+        )
+        user = cursor.fetchone()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        db.close()

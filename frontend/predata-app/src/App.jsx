@@ -2,6 +2,7 @@
 import { useState } from "react"
 import axios from "axios"
 import "./App.css"
+import Auth from "./Auth"
 
 const API = "https://predata-project.onrender.com"
 
@@ -299,15 +300,36 @@ function CropIntelligence() {
 
 //  Main App 
 export default function App() {
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem("user")
+    return saved ? JSON.parse(saved) : null
+  })
+
+  const handleLogin  = (userData) => setUser(userData)
+  const handleLogout = () => {
+    localStorage.removeItem("user")
+    localStorage.removeItem("token")
+    setUser(null)
+  }
+
+  if (!user) return <Auth onLogin={handleLogin} />
+
   return (
     <div>
       <nav className="navbar">
         <h1>🌿 AgroSense NG — Farm Assistant</h1>
-        <span>AI-Powered Microclimate Prediction & Crop Advisory for Nigeria</span>
+        <div style={{display:"flex", alignItems:"center", gap:"1rem"}}>
+          <span style={{fontSize:"0.85rem"}}>👤 {user.full_name} | {user.state}</span>
+          <button onClick={handleLogout} style={{
+            background:"rgba(255,255,255,0.2)",
+            border:"1px solid rgba(255,255,255,0.4)",
+            color:"white", padding:"0.3rem 0.8rem",
+            borderRadius:"6px", cursor:"pointer", fontSize:"0.8rem"
+          }}>Logout</button>
+        </div>
       </nav>
 
       <div className="container">
-        {/* Stats Bar */}
         <div className="stats">
           <div className="stat-card">
             <div className="value">99.55%</div>
@@ -327,29 +349,24 @@ export default function App() {
           </div>
         </div>
 
-        {/* Main Cards */}
         <div className="cards">
           <CropAdvisor />
           <WeatherPredictor />
         </div>
 
-        {/* Crop Intelligence — Full Width */}
         <div className="cards">
           <CropIntelligence />
         </div>
 
-        {/* USSD Link */}
         <div style={{textAlign:"center", marginTop:"2rem", marginBottom:"2rem"}}>
           <a href="https://agrosense-ussd.vercel.app" target="_blank" style={{
             background:"#2d6a4f", color:"#fff",
             padding:"0.75rem 2rem", borderRadius:"8px",
-            textDecoration:"none", fontWeight:"bold",
-            fontSize:"1rem"
+            textDecoration:"none", fontWeight:"bold", fontSize:"1rem"
           }}>
              Open USSD Simulator (*384*1#) — For Smallholder Farmers
           </a>
         </div>
-
       </div>
     </div>
   )
