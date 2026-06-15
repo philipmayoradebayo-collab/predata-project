@@ -6,8 +6,10 @@
 
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: #f0f4f0;
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 25%, #e0f2f1 50%, #f9fbe7 75%, #e8f5e9 100%);
+  background-attachment: fixed;
   color: #1a1a1a;
+  min-height: 100vh;
 }
 
 .navbar {
