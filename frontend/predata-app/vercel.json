@@ -1,7 +1,12 @@
 {
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/ussd", "destination": "/ussd.html" },
-    { "source": "/((?!ussd).*)", "destination": "/index.html" }
+  "routes": [
+    {
+      "src": "/ussd.html",
+      "dest": "/ussd.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ]
 }
