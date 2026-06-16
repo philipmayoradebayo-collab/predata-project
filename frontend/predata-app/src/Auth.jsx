@@ -193,7 +193,7 @@ export default function Auth({ onLogin }) {
             borderRadius:"8px", padding:"0.75rem",
             color:"#c62828", fontSize:"0.85rem", marginBottom:"1rem"
           }}>
-            ❌ {error}
+             {error}
           </div>
         )}
 
@@ -203,7 +203,7 @@ export default function Auth({ onLogin }) {
           color:"white", border:"none", borderRadius:"8px",
           fontSize:"1rem", fontWeight:"700", cursor:"pointer"
         }}>
-          {loading ? "Please wait..." : mode === "login" ? "🔐 Login" : "✅ Create Account"}
+          {loading ? "Please wait..." : mode === "login" ? " Login" : " Create Account"}
         </button>
 
         <p style={{textAlign:"center", marginTop:"1rem", fontSize:"0.85rem", color:"#888"}}>
@@ -222,10 +222,10 @@ export default function Auth({ onLogin }) {
           background:"#e8f5e9", borderRadius:"8px",
           textAlign:"center", fontSize:"0.8rem", color:"#2d6a4f"
         }}>
-          📱 Smallholder farmer? No login needed!<br/>
+           Smallholder farmer? No login needed!<br/>
           <a href="https://agrosense-ussd.vercel.app" target="_blank"
              style={{color:"#2d6a4f", fontWeight:"600"}}>
-            Use USSD Simulator →
+            Use USSD Simulator 
           </a>
         </div>
       </div>
