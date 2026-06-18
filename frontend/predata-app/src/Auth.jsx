@@ -15,7 +15,19 @@ export default function Auth({ onLogin }) {
 
   const handle = e => setForm({ ...form, [e.target.name]: e.target.value })
 
-  const submit = async () => {
+const submit = async () => {
+    // Validation
+    if (!form.email || !form.password) {
+      setError("Please fill in all required fields!")
+      return
+    }
+    if (mode === "register") {
+      if (!form.full_name) { setError("Please enter your full name!"); return }
+      if (!form.phone) { setError("Please enter your phone number!"); return }
+      if (!form.state) { setError("Please select your state!"); return }
+      if (!form.farm_size) { setError("Please select your farm size!"); return }
+      if (form.password.length < 6) { setError("Password must be at least 6 characters!"); return }
+    }
     setLoading(true); setError(null)
     try {
       if (mode === "register") {
